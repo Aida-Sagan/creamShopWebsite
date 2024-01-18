@@ -1,0 +1,100 @@
+Author: Aida
+Project: cream shop website
+Stack: JavaScript, nodeJS, HTML/CSS, MongoDB, Typescript
+---------------------------------------------------------
+
+Сайт каталог магазина косметики "Amal` cream"
+
+Цель проекта: пользователи будут заходить на сайт, чтобы ознакомиться с товарами. Товары на странице, комментарии прогружаются
+ с базы данных (используется СУБД MongoDB).
+----------------------------------------------
+
+Проект разрабатывается с использованием следующих технологий и инструментов:
+
+* Node.js и Express: Бэкенд-сервер, обеспечивающий логику приложения.
+* HTML/CSS Javascript для создания интерфейса пользователя
+* MongoDB и Mongoose: База данных и инструмент для работы с ней
+* Axios и Fetch: Библиотеки для выполнения HTTP-запросов.
+* Nodemon: Инструмент для автоматического перезапуска сервера при изменениях в коде.
+
+------------------------------------------------------------------------------------
+
+Сценарий запуска проекта:
+
+npm run start
+
+Если все верно запустилось в терминале должны отобразиться сообщения:
+сервер запущен
+Мы подключились
+------------------------------------------------------------------------------------
+
+JavaSCript
+
+**************** Поиск по товарам *********************
+Данный фрагмент кода отвечает за реализацию поиска по товарам на сайте. Когда пользователь вводит текст в поле поиска и
+нажимает клавишу "Enter", происходит отправка запроса на сервер, который обрабатывает запрос и возвращает результаты поиска.
+
+//получать инфу из поля
+//ссылка на это поле поиска
+const search = document.querySelector('header input')
+
+window.addEventListener('keydown',async (event)=>{
+    if(event.key == 'Enter' && search.value != "" && search == document.activeElement){
+        let searchText = search.value
+        const result = await fetch('http://localhost:7000/api/cream-items/search', {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({search: searchText})
+        }).then(res => {return res.json() })
+            .then(data => {
+                console.log(data)
+            })
+    }
+})
+
+---------------------------------------------------------------------------------
+
+Загрузка комментариев с сервера
+
+
+// Загрузка комментариев с сервера
+window.addEventListener('DOMContentLoaded', async function() {
+    try {
+        const response = await fetch('http://localhost:7000/api/comments/' + url.searchParams.get('id'));
+        const data = await response.json();
+        console.log('Комментарии с сервера:', data);
+
+        // Отображение комментариев на странице
+        if (data.length > 0) {
+            document.querySelector("#comments").innerHTML = "";
+            countComments = data.length;
+            document.querySelector(".count-comm").innerHTML = countComments;
+
+            for (let i = data.length - 1; i >= 0; i--) {
+                let newComment = "<div class='comment' id='block-" + data[i]._id + "'>" +
+                    "<span class='delete' onclick='delComm(" + data[i]._id + ")'>&times;</span>" +
+                    "<p class='name'>" + data[i].name + "</p>" +
+                    "<p class='mess'>" + data[i].comment + "</p>" +
+                    "</div>";
+
+                document.querySelector("#comments").insertAdjacentHTML('afterbegin', newComment);
+            }
+        }
+    } catch (err) {
+        console.log('Ошибка при загрузке комментариев:', err);
+    }
+});
+
+Данный код отвечает за загрузку комментариев с сервера и их отображение на странице.
+
+* Событие "DOMContentLoaded": Код выполняется после полной загрузки содержимого страницы,
+чтобы гарантировать, что DOM-структура полностью построена.
+* Запрос к серверу: Осуществляется асинхронный запрос к серверу для получения комментариев по заданному id
+с помощью Использования await с fetch в асинхронной функции позволяет сделать код более читаемым
+и управляемым при выполнении асинхронных операций
+* Отображение комментариев: Если есть полученные комментарии, они отображаются на странице.
+Каждый комментарий добавляется в DOM.
+------------------------------------------------------------------------------------------------------------------------
